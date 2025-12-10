@@ -575,12 +575,14 @@ def train(args):
     from clearml import Task
 
     task = Task.init(
-        project_name='OT2-RL-Controller/Zofia_240272',
-        task_name=args.run_name
-    )
+    project_name='OT2-RL-Controller/Zofia_240272',
+    task_name=args.run_name
+)
 
     # Set base docker image
     task.set_base_docker('deanis/2023y2b-rl:latest')
+
+    task.set_environment(WANDB_API_KEY='914ae068e68f7aa8e0bef176d0a165d47f9b4c7f')
 
     # Connect hyperparameters
     task.connect(vars(args))
@@ -611,20 +613,14 @@ def train(args):
     
     # Initialize W&B
     if not args.no_wandb:
+    # Login to W&B using environment variable (set by ClearML)
+        wandb_api_key = os.environ.get('WANDB_API_KEY', None)
+        if wandb_api_key:
+            wandb.login(key=wandb_api_key)
+        
         config = {
             'algorithm': args.algorithm,
-            'total_timesteps': args.total_timesteps,
-            'n_envs': args.n_envs,
-            'learning_rate': args.learning_rate,
-            'batch_size': args.batch_size,
-            'n_steps': args.n_steps if args.algorithm == 'PPO' else None,
-            'network_arch': args.net_arch,
-            'success_threshold': args.success_threshold,
-            'reward_scale': args.reward_scale,
-            'max_velocity': args.max_velocity,
-            'max_steps_per_episode': args.max_steps,
-            'student_id': '240272',
-            'seed': args.seed
+            # ... rest stays the same
         }
         
         run = wandb.init(
@@ -636,11 +632,6 @@ def train(args):
             monitor_gym=True,
             save_code=True
         )
-        print(" Weights & Biases initialized")
-        print(f"  Dashboard: {run.url}\n")
-    else:
-        run = None
-        print(" W&B logging disabled\n")
     
     # Set random seed
     set_random_seed(args.seed)
