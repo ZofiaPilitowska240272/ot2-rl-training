@@ -194,55 +194,87 @@ class OT2GymEnv(gym.Env):
         self._create_ot2_robot()
         
 
-
     def _create_ot2_robot(self):
-        """
-        Actual OT-2 robot from  ot_2_simulation_v6.urdf file.
-        """
+        """Load your actual OT-2 robot from URDF."""
+        
+        # DEBUG: Check files
+        import os
+        print(f"DEBUG: Current directory: {os.getcwd()}")
+        print(f"DEBUG: Files here: {os.listdir('.')}")
+        print(f"DEBUG: URDF exists? {os.path.exists('ot_2_simulation_v6.urdf')}")
+        
         # Robot position at origin
         robot_position = [0, 0, 0.03]
         robot_orientation = [0, 0, 0, 1]
         
         # Load the OT-2 URDF
         try:
+            print(f"DEBUG: Attempting to load URDF...")
             self.robot_id = p.loadURDF(
                 "ot_2_simulation_v6.urdf",
                 robot_position,
                 robot_orientation,
                 flags=p.URDF_USE_INERTIA_FROM_FILE
             )
+            print(f"DEBUG: URDF loaded successfully! Robot ID: {self.robot_id}")
         except Exception as e:
+            # Print the ACTUAL PyBullet error
+            print(f"DEBUG: PyBullet error type: {type(e)}")
+            print(f"DEBUG: PyBullet error message: {str(e)}")
+            import traceback
+            traceback.print_exc()
             raise FileNotFoundError(
                 f"Could not load ot_2_simulation_v6.urdf. "
                 f"Make sure it's in the current directory. Error: {e}"
             )
+    # def _create_ot2_robot(self):
+    #     """
+    #     Actual OT-2 robot from  ot_2_simulation_v6.urdf file.
+    #     """
+    #     # Robot position at origin
+    #     robot_position = [0, 0, 0.03]
+    #     robot_orientation = [0, 0, 0, 1]
         
-        # Fix the robot base in space
-        start_position, start_orientation = p.getBasePositionAndOrientation(self.robot_id)
-        p.createConstraint(
-            parentBodyUniqueId=self.robot_id,
-            parentLinkIndex=-1,
-            childBodyUniqueId=-1,
-            childLinkIndex=-1,
-            jointType=p.JOINT_FIXED,
-            jointAxis=[0, 0, 0],
-            parentFramePosition=[0, 0, 0],
-            childFramePosition=start_position,
-            childFrameOrientation=start_orientation
-        )
+    #     # Load the OT-2 URDF
+    #     try:
+    #         self.robot_id = p.loadURDF(
+    #             "ot_2_simulation_v6.urdf",
+    #             robot_position,
+    #             robot_orientation,
+    #             flags=p.URDF_USE_INERTIA_FROM_FILE
+    #         )
+    #     except Exception as e:
+    #         raise FileNotFoundError(
+    #             f"Could not load ot_2_simulation_v6.urdf. "
+    #             f"Make sure it's in the current directory. Error: {e}"
+    #         )
         
-        # Store base position
-        self.robot_base_position = np.array(start_position, dtype=np.float32)
+    #     # Fix the robot base in space
+    #     start_position, start_orientation = p.getBasePositionAndOrientation(self.robot_id)
+    #     p.createConstraint(
+    #         parentBodyUniqueId=self.robot_id,
+    #         parentLinkIndex=-1,
+    #         childBodyUniqueId=-1,
+    #         childLinkIndex=-1,
+    #         jointType=p.JOINT_FIXED,
+    #         jointAxis=[0, 0, 0],
+    #         parentFramePosition=[0, 0, 0],
+    #         childFramePosition=start_position,
+    #         childFrameOrientation=start_orientation
+    #     )
         
-        # Set initial joint positions
-        initial_joints = [0.04, 0.065, 0.11]  # Center of measured ranges
-        for i in range(3):
-            p.resetJointState(self.robot_id, i, targetValue=initial_joints[i])
+    #     # Store base position
+    #     self.robot_base_position = np.array(start_position, dtype=np.float32)
         
-        # Store initial pipette position
-        self.initial_position = self._get_pipette_position()
+    #     # Set initial joint positions
+    #     initial_joints = [0.04, 0.065, 0.11]  # Center of measured ranges
+    #     for i in range(3):
+    #         p.resetJointState(self.robot_id, i, targetValue=initial_joints[i])
         
-        print(f"Robot loaded. Initial pipette position: {self.initial_position}")
+    #     # Store initial pipette position
+    #     self.initial_position = self._get_pipette_position()
+        
+    #     print(f"Robot loaded. Initial pipette position: {self.initial_position}")
         
 
 
