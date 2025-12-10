@@ -572,28 +572,23 @@ def train(args):
     
     # ============================================================
     # CLEARML INITIALIZATION
-    # ============================================================
     from clearml import Task
-    
+
     task = Task.init(
         project_name='OT2-RL-Controller/Zofia_240272',
         task_name=args.run_name
     )
 
-    # IMPORTANT: Disable automatic git detection for private repos
-    task.set_repo(repo=None, branch=None, commit=None)
-
     # Set base docker image
     task.set_base_docker('deanis/2023y2b-rl:latest')
-    
-    # Connect hyperparameters (ClearML will track these)
+
+    # Connect hyperparameters
     task.connect(vars(args))
-    
-    # Execute remotely on the queue
+
+    # Execute remotely
     task.execute_remotely(queue_name="default")
 
     # Print header
-    print("\n" + "="*80)
     print("OT-2 RL CONTROLLER TRAINING")
     print(f"Date: {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}")
     print(f"Run name: {args.run_name}")
