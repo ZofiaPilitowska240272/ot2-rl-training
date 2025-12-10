@@ -492,7 +492,7 @@ def create_model(algorithm: str, env, args):
         'verbose': 1,
         'seed': args.seed,
         'device': 'cuda' if args.use_gpu else 'auto',
-        'tensorboard_log': f"./tensorboard_logs/{args.run_name}",
+        'tensorboard_log': None,
     }
     
     # Policy network architecture
