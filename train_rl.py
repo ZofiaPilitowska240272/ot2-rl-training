@@ -636,7 +636,7 @@ def train(args):
             entity=args.wandb_entity,
             name=args.run_name,
             config=config,
-            sync_tensorboard=True,
+            sync_tensorboard=False, 
             monitor_gym=True,
             save_code=True
         )
@@ -832,7 +832,6 @@ def train(args):
             print(" Models uploaded to W&B\n")
         
     except KeyboardInterrupt:
-        print("\n\n" + "="*80)
         print("TRAINING INTERRUPTED BY USER")
         print("="*80)
         
