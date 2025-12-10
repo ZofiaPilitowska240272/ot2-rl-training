@@ -661,15 +661,11 @@ def train(args):
     print("Creating environments...")
     
     # Create vectorized training environments
-    if args.n_envs > 1:
-        env = SubprocVecEnv([
-            make_env(i, args.seed, **env_kwargs) 
-            for i in range(args.n_envs)
-        ])
-        print(f" Created {args.n_envs} parallel training environments")
-    else:
-        env = DummyVecEnv([make_env(0, args.seed, **env_kwargs)])
-        print(f" Created 1 training environment")
+    env = DummyVecEnv([
+    make_env(i, args.seed, **env_kwargs) 
+    for i in range(args.n_envs)
+    ])
+
     
     # Create evaluation environment
     eval_env = OT2GymEnv(**env_kwargs)
