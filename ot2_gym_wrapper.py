@@ -376,43 +376,22 @@ class OT2GymEnv(gym.Env):
 
 
 
-    def _compute_reward(
-        self, 
-        current_pos: np.ndarray, 
-        target_pos: np.ndarray, 
-        action: np.ndarray,
-        distance: float
-    ) -> float:
-        """
-        Compute reward for current state and action.
+    def _compute_reward(self, current_pos, target_pos, action, distance):
+        # Dense reward: encourage moving closer, stronger near target
+        dense_reward = -distance  # coarse reward
+        precision_reward = np.exp(-10.0 * distance**2)  # strong reward near target
         
-        Reward components:
-        1. Dense: negative distance (encourages moving closer)
-        2. Sparse: large bonus for reaching goal
-        3. Action penalty: encourages smooth, efficient movements
-        
-        Args:
-            current_pos: Current pipette position
-            target_pos: Target position
-            action: Action taken
-            distance: Distance to target
-            
-        Returns:
-            Total reward
-        """
-        # Dense reward: negative distance
-        dense_reward = -distance
-        
-        # Sparse reward: goal reached
+        # Sparse goal reward
         sparse_reward = 100.0 if distance < self.success_threshold else 0.0
         
-        # Action penalty: encourage energy efficiency
-        action_penalty = -0.01 * np.sum(action ** 2)
+        # Action penalty for smoothness
+        action_penalty = -0.005 * np.sum(action**2)  # reduce weight slightly
         
-        # Total reward
-        total_reward = (dense_reward + sparse_reward + action_penalty) * self.reward_scale
+        # Combine
+        total_reward = (dense_reward + precision_reward + sparse_reward + action_penalty) * self.reward_scale
         
         return total_reward
+
     
 
 
@@ -655,9 +634,9 @@ class OT2GymEnv(gym.Env):
 # Example usage and testing
 if __name__ == "__main__":
     # Create environment
-    env = OT2GymEnv(use_gui=True, max_steps=200)
+    env = OT2GymEnv(success_threshold=0.002, max_steps=500)
     
-    print("\nEnvironment created successfully!")
+    print("\nEnvironment created ")
     print(f"Action space: {env.action_space}")
     print(f"Observation space: {env.observation_space}")
     
