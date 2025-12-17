@@ -27,10 +27,11 @@ parameters:
   
   # Network architecture (space-separated integers)
   net_arch:
-  values:
-    - "128 128"
-    - "256 256"
-    - "512 512"
+    values:
+      - 128 128
+      - 256 256
+      - 512 512
+
 
   
   # Discount factor

@@ -1,0 +1,36 @@
+wandb_version: 1
+
+algorithm:
+  value: TD3
+batch_size:
+  value: 128
+clip_range:
+  value: 0.21458324064059156
+ent_coef:
+  value: 0.001126246322955079
+gae_lambda:
+  value: 0.9134435473552784
+gamma:
+  value: 0.9762679036417378
+learning_rate:
+  value: 0.00018524802538607407
+max_steps:
+  value: 300
+max_velocity:
+  value: 0.05893221410302859
+n_envs:
+  value: 1
+n_steps:
+  value: 2048
+net_arch:
+  value: 256 256
+reward_scale:
+  value: 4.225531809400362
+seed:
+  value: 456
+success_threshold:
+  value: 0.005
+total_timesteps:
+  value: 1000000
+vf_coef:
+  value: 0.16826516891267873

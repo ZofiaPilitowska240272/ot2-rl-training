@@ -146,7 +146,21 @@ def parse_args():
     parser.add_argument('--max_velocity', type=float, default=0.05)
     
     # Network
-    parser.add_argument('--net_arch', nargs='+', type=int, default=[256, 256])
+    parser.add_argument("--clip_range", type=float, default=None)
+    parser.add_argument("--ent_coef", type=float, default=None)
+    parser.add_argument("--gae_lambda", type=float, default=None)
+    parser.add_argument("--gamma", type=float, default=0.99)
+    parser.add_argument("--vf_coef", type=float, default=None)
+
+
+    parser.add_argument(
+        "--net_arch",
+        type=str,
+        default="256 256",
+        help="Hidden layer sizes, e.g. '256 256'"
+    )
+
+
     
     # Logging
     parser.add_argument('--run_name', type=str, default=None)
@@ -162,6 +176,13 @@ def parse_args():
 # ===================== Model Creation =====================
 def create_model(algorithm, env, args):
     """Create RL model with proper hyperparameters."""
+    import ast
+
+    if isinstance(args.net_arch, str):
+        # convert "256 256" -> [256, 256]
+        args.net_arch = [int(x) for x in args.net_arch.split()]
+
+
     policy_kwargs = {'net_arch': args.net_arch}
     common_params = {
         'policy': 'MlpPolicy',
