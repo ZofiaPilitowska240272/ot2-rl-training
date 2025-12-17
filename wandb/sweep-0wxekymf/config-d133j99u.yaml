@@ -1,0 +1,39 @@
+wandb_version: 1
+
+algorithm:
+  value: SAC
+batch_size:
+  value: 512
+clip_range:
+  value: 0.12770291007330464
+ent_coef:
+  value: 0.0001319874947706352
+gae_lambda:
+  value: 0.9884694642772583
+gamma:
+  value: 0.9934036716108134
+learning_rate:
+  value: 0.0006538589072825971
+max_steps:
+  value: 500
+max_velocity:
+  value: 0.03211213120590141
+n_envs:
+  value: 1
+n_steps:
+  value: 4096
+net_arch:
+  value:
+  - 256
+  - 256
+  - 256
+reward_scale:
+  value: 4.822020167745096
+seed:
+  value: 456
+success_threshold:
+  value: 0.005
+total_timesteps:
+  value: 1000000
+vf_coef:
+  value: 0.7647734606623483

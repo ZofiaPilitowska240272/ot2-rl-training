@@ -25,13 +25,12 @@ parameters:
   n_steps:  # PPO only
     values: [1024, 2048, 4096]
   
-  # Network architecture
+  # Network architecture (space-separated integers)
   net_arch:
-    values: 
-      - [128, 128]
-      - [256, 256]
-      - [256, 256, 256]
-      - [512, 512]
+    values:
+      - 128 128
+      - 256 256
+      - 512 512
   
   # Discount factor
   gamma:
