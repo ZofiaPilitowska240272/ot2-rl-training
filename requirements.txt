@@ -1,8 +1,9 @@
-# Core RL and Simulation
-gymnasium>=0.29.0
-stable-baselines3>=2.2.0
-pybullet>=3.2.5
-numpy>=1.24.0,<2.0.0
+gymnasium==1.2.2
+matplotlib==3.7.2        # compatible with Python 3.10
+numpy>=1.26.0,<2.3       # valid latest stable Numpy versions
+pybullet==3.2.7
+stable-baselines3==2.7.0
+clearml==2.0.2
 
 # Experiment Tracking
 wandb>=0.15.0
