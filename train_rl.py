@@ -118,9 +118,11 @@ def create_model(algorithm, env, args):
 def train(args):
     # ------------------ ClearML Task ------------------
     if args.run_name is None:
-        args.run_name = f"{args.algorithm}_{datetime.now().strftime('%Y%m%d_%H%M%S')}"
-
-    task = Task.init(project_name='OT2-RL-Controller', task_name=args.run_name)
+        args.run_name = (
+            f"{args.algorithm}_steps{args.total_timesteps}_lr{args.learning_rate}"
+            f"{datetime.now().strftime('%Y%m%d_%H%M%S')}"
+        )
+    task = Task.init(project_name='Mentor Group - Uther/Group 2', task_name=args.run_name)
     task.connect(vars(args))
     task.execute_remotely(queue_name="default")
     print(f"ClearML task initialized: {task.id}")
