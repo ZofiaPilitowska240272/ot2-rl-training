@@ -124,6 +124,7 @@ def train(args):
         )
     task = Task.init(project_name='Mentor Group - Uther/Group 2', task_name=args.run_name)
     task.connect(vars(args))
+    task.set_base_docker('deanis/2023y2b-rl:latest')
     task.execute_remotely(queue_name="default")
     print(f"ClearML task initialized: {task.id}")
 
