@@ -9,6 +9,7 @@ Usage:
     python queue_all_configs.py
 """
 
+import os
 from clearml import Task
 from configs_12_models import CONFIGS
 import time
@@ -32,11 +33,49 @@ def queue_experiment(config_index):
         working_directory='.',
         repo=None,
         branch=None,
-        add_task_init_call=True
+        add_task_init_call=False  # Changed to False - train_rl.py already has Task.init
     )
     
     # Set execution settings
     task.set_base_docker('deanis/2023y2b-rl:latest')
+    
+    # IMPORTANT: FORCE install critical packages
+    # Always add these explicitly to ensure they're installed
+    critical_packages = [
+        'clearml==2.0.2',
+        'wandb==0.23.1',
+    ]
+    
+    # Then add requirements from file
+    requirements_files = ['requirements.txt', 'requirements_clearml.txt']
+    packages_set = False
+    
+    for req_file in requirements_files:
+        if os.path.exists(req_file):
+            print(f"  Using requirements from: {req_file}")
+            with open(req_file, 'r') as f:
+                requirements = [line.strip() for line in f 
+                              if line.strip() and not line.startswith('#')]
+            
+            # Combine: critical packages FIRST, then requirements
+            all_packages = critical_packages + requirements
+            task.set_packages(all_packages)
+            packages_set = True
+            print(f"  Total packages: {len(all_packages)} (including {len(critical_packages)} critical)")
+            break
+    
+    if not packages_set:
+        # Fallback: Just critical + essentials
+        print("  Using manual package list")
+        task.set_packages(critical_packages + [
+            'stable-baselines3==2.7.0',
+            'gymnasium==1.2.2',
+            'pybullet==3.2.7',
+            'torch==2.9.1',
+            'numpy==1.26.2',
+            'matplotlib==3.10.7',
+            'pandas==2.1.4'
+        ])
     
     # Build command-line arguments for train_rl.py
     args_dict = {
