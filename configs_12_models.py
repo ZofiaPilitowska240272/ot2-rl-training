@@ -6,15 +6,15 @@ These configs are designed to explore the hyperparameter space systematically.
 Author: Zofia Pilitowska (240272)
 """
 
-# 12 carefully selected configurations
+# 12 SPEED-OPTIMIZED configurations
 CONFIGS = [
-    # ========== CONSERVATIVE CONFIGS (Lower LR, More Stable) ==========
+    # ========== FAST PPO - HIGH PARALLELISM (Run on CPU) ==========
     {
-        'name': 'ppo_256x2_lr5e5_b256',
-        'description': 'Stable baseline - small network, safe learning rate',
+        'name': 'ppo_256x2_lr1e4_env16',
+        'description': 'Fast baseline - 16 parallel envs',
         'algorithm': 'PPO',
-        'total_timesteps': 2000000,
-        'learning_rate': 5e-5,
+        'total_timesteps': 1000000,
+        'learning_rate': 1e-4,
         'batch_size': 256,
         'n_steps': 2048,
         'net_arch': '256 256',
@@ -25,16 +25,123 @@ CONFIGS = [
         'vf_coef': 0.5,
         'max_velocity': 0.03,
         'reward_scale': 0.5,
-        'max_steps': 700,
-        'n_envs': 4,
+        'max_steps': 400,
+        'n_envs': 16,
         'seed': 42
     },
     
     {
-        'name': 'ppo_512x2_lr5e5_b512_vel025',
-        'description': 'Very slow movement (0.025 m/s), large net, long episodes',
+        'name': 'ppo_512x2_lr1e4_env16_vel02',
+        'description': 'BEST BET: 16 envs, slow velocity (0.02), large network',
         'algorithm': 'PPO',
-        'total_timesteps': 2000000,
+        'total_timesteps': 1000000,
+        'learning_rate': 1e-4,
+        'batch_size': 512,
+        'n_steps': 2048,
+        'net_arch': '512 512',
+        'gamma': 0.99,
+        'gae_lambda': 0.95,
+        'clip_range': 0.2,
+        'ent_coef': 0.001,
+        'vf_coef': 0.5,
+        'max_velocity': 0.02,
+        'reward_scale': 1.0,
+        'max_steps': 500,
+        'n_envs': 16,
+        'seed': 42
+    },
+    
+    {
+        'name': 'ppo_256x3_lr5e5_env24_g995',
+        'description': '24 envs! Deep network, high gamma for precision',
+        'algorithm': 'PPO',
+        'total_timesteps': 1000000,
+        'learning_rate': 5e-5,
+        'batch_size': 256,
+        'n_steps': 2048,
+        'net_arch': '256 256 256',
+        'gamma': 0.995,
+        'gae_lambda': 0.95,
+        'clip_range': 0.15,
+        'ent_coef': 0.0005,
+        'vf_coef': 0.5,
+        'max_velocity': 0.03,
+        'reward_scale': 0.8,
+        'max_steps': 400,
+        'n_envs': 24,
+        'seed': 123
+    },
+    
+    {
+        'name': 'ppo_512x2_lr8e5_env24',
+        'description': '24 envs, balanced, very fast training',
+        'algorithm': 'PPO',
+        'total_timesteps': 1000000,
+        'learning_rate': 8e-5,
+        'batch_size': 512,
+        'n_steps': 2048,
+        'net_arch': '512 512',
+        'gamma': 0.99,
+        'gae_lambda': 0.95,
+        'clip_range': 0.2,
+        'ent_coef': 0.003,
+        'vf_coef': 0.5,
+        'max_velocity': 0.035,
+        'reward_scale': 0.7,
+        'max_steps': 400,
+        'n_envs': 24,
+        'seed': 456
+    },
+    
+    # ========== ULTRA-FAST PPO (32 envs) ==========
+    {
+        'name': 'ppo_256x2_lr2e4_env32',
+        'description': 'FASTEST: 32 parallel envs, aggressive learning',
+        'algorithm': 'PPO',
+        'total_timesteps': 1000000,
+        'learning_rate': 2e-4,
+        'batch_size': 512,
+        'n_steps': 1024,
+        'net_arch': '256 256',
+        'gamma': 0.99,
+        'gae_lambda': 0.95,
+        'clip_range': 0.3,
+        'ent_coef': 0.01,
+        'vf_coef': 0.5,
+        'max_velocity': 0.04,
+        'reward_scale': 0.5,
+        'max_steps': 300,
+        'n_envs': 32,
+        'seed': 42
+    },
+    
+    {
+        'name': 'ppo_512x2_lr1e4_env32_bal',
+        'description': '32 envs, balanced LR, excellent speed',
+        'algorithm': 'PPO',
+        'total_timesteps': 1000000,
+        'learning_rate': 1e-4,
+        'batch_size': 512,
+        'n_steps': 1024,
+        'net_arch': '512 512',
+        'gamma': 0.99,
+        'gae_lambda': 0.95,
+        'clip_range': 0.2,
+        'ent_coef': 0.005,
+        'vf_coef': 0.5,
+        'max_velocity': 0.03,
+        'reward_scale': 0.5,
+        'max_steps': 400,
+        'n_envs': 32,
+        'seed': 123
+    },
+    
+    # ========== PRECISION PPO (16 envs) ==========
+    {
+        'name': 'ppo_512x2_lr5e5_env16_vel025',
+        'description': 'Very slow velocity (0.025), 16 envs, stable',
+        'algorithm': 'PPO',
+        'total_timesteps': 1000000,
         'learning_rate': 5e-5,
         'batch_size': 512,
         'n_steps': 2048,
@@ -46,169 +153,19 @@ CONFIGS = [
         'vf_coef': 0.5,
         'max_velocity': 0.025,
         'reward_scale': 0.5,
-        'max_steps': 1000,
-        'n_envs': 4,
-        'seed': 42
-    },
-    
-    {
-        'name': 'ppo_256x3_lr3e5_g995',
-        'description': 'Deep 3-layer net, highest gamma for long-term precision',
-        'algorithm': 'PPO',
-        'total_timesteps': 2000000,
-        'learning_rate': 3e-5,
-        'batch_size': 256,
-        'n_steps': 4096,
-        'net_arch': '256 256 256',
-        'gamma': 0.995,
-        'gae_lambda': 0.95,
-        'clip_range': 0.15,
-        'ent_coef': 0.0005,
-        'vf_coef': 0.5,
-        'max_velocity': 0.03,
-        'reward_scale': 0.8,
-        'max_steps': 700,
-        'n_envs': 4,
-        'seed': 123
-    },
-    
-    # ========== MODERATE CONFIGS (Balanced) ==========
-    {
-        'name': 'ppo_512x2_lr1e4_env8',
-        'description': 'Balanced config with 8 parallel envs for speed',
-        'algorithm': 'PPO',
-        'total_timesteps': 2000000,
-        'learning_rate': 1e-4,
-        'batch_size': 256,
-        'n_steps': 2048,
-        'net_arch': '512 512',
-        'gamma': 0.99,
-        'gae_lambda': 0.95,
-        'clip_range': 0.2,
-        'ent_coef': 0.005,
-        'vf_coef': 0.5,
-        'max_velocity': 0.04,
-        'reward_scale': 0.5,
         'max_steps': 500,
-        'n_envs': 8,
-        'seed': 42
+        'n_envs': 16,
+        'seed': 789
     },
     
     {
-        'name': 'ppo_512x2_lr1e4_vel02_s1000',
-        'description': 'RECOMMENDED: Slowest velocity (0.02), longest episodes, precision-focused',
+        'name': 'ppo_512x2_lr3e5_env16_vel02_g995',
+        'description': 'PRECISION: slowest velocity (0.02), highest gamma, 16 envs',
         'algorithm': 'PPO',
-        'total_timesteps': 2000000,
-        'learning_rate': 1e-4,
-        'batch_size': 512,
-        'n_steps': 2048,
-        'net_arch': '512 512',
-        'gamma': 0.99,
-        'gae_lambda': 0.95,
-        'clip_range': 0.2,
-        'ent_coef': 0.001,
-        'vf_coef': 0.5,
-        'max_velocity': 0.02,
-        'reward_scale': 1.0,
-        'max_steps': 1000,
-        'n_envs': 4,
-        'seed': 456
-    },
-    
-    {
-        'name': 'ppo_256x2_lr8e5_clip25',
-        'description': 'Well-balanced reliable config, good all-around performance',
-        'algorithm': 'PPO',
-        'total_timesteps': 2000000,
-        'learning_rate': 8e-5,
-        'batch_size': 256,
-        'n_steps': 4096,
-        'net_arch': '256 256',
-        'gamma': 0.99,
-        'gae_lambda': 0.95,
-        'clip_range': 0.25,
-        'ent_coef': 0.003,
-        'vf_coef': 0.5,
-        'max_velocity': 0.035,
-        'reward_scale': 0.7,
-        'max_steps': 700,
-        'n_envs': 4,
-        'seed': 42
-    },
-    
-    # ========== AGGRESSIVE CONFIGS (Higher LR, Faster Learning) ==========
-    {
-        'name': 'ppo_512x2_lr3e4_env8',
-        'description': 'Fastest learning rate (3e-4), fastest velocity, 8 envs',
-        'algorithm': 'PPO',
-        'total_timesteps': 2000000,
-        'learning_rate': 3e-4,
-        'batch_size': 512,
-        'n_steps': 2048,
-        'net_arch': '512 512',
-        'gamma': 0.99,
-        'gae_lambda': 0.95,
-        'clip_range': 0.3,
-        'ent_coef': 0.01,
-        'vf_coef': 0.5,
-        'max_velocity': 0.05,
-        'reward_scale': 0.3,
-        'max_steps': 500,
-        'n_envs': 8,
-        'seed': 42
-    },
-    
-    {
-        'name': 'ppo_512x3_lr2e4_b256',
-        'description': 'Widest & deepest network (512x3), good for complex control',
-        'algorithm': 'PPO',
-        'total_timesteps': 2000000,
-        'learning_rate': 2e-4,
-        'batch_size': 256,
-        'n_steps': 2048,
-        'net_arch': '512 512 512',
-        'gamma': 0.99,
-        'gae_lambda': 0.95,
-        'clip_range': 0.2,
-        'ent_coef': 0.005,
-        'vf_coef': 0.5,
-        'max_velocity': 0.03,
-        'reward_scale': 0.5,
-        'max_steps': 700,
-        'n_envs': 4,
-        'seed': 123
-    },
-    
-    {
-        'name': 'ppo_256x2_lr2e4_ent01_env8',
-        'description': 'Maximum exploration (high entropy), parallel training',
-        'algorithm': 'PPO',
-        'total_timesteps': 2000000,
-        'learning_rate': 2e-4,
-        'batch_size': 256,
-        'n_steps': 4096,
-        'net_arch': '256 256',
-        'gamma': 0.98,
-        'gae_lambda': 0.9,
-        'clip_range': 0.25,
-        'ent_coef': 0.01,
-        'vf_coef': 0.3,
-        'max_velocity': 0.04,
-        'reward_scale': 0.5,
-        'max_steps': 500,
-        'n_envs': 8,
-        'seed': 456
-    },
-    
-    # ========== SPECIALIZED CONFIGS (Edge Cases) ==========
-    {
-        'name': 'ppo_512x2_lr3e5_vel02_g995',
-        'description': 'MAXIMUM PRECISION: slowest movement, highest gamma, minimal entropy',
-        'algorithm': 'PPO',
-        'total_timesteps': 2000000,
+        'total_timesteps': 1000000,
         'learning_rate': 3e-5,
         'batch_size': 512,
-        'n_steps': 4096,
+        'n_steps': 2048,
         'net_arch': '512 512',
         'gamma': 0.995,
         'gae_lambda': 0.98,
@@ -217,51 +174,79 @@ CONFIGS = [
         'vf_coef': 0.5,
         'max_velocity': 0.02,
         'reward_scale': 1.0,
-        'max_steps': 1000,
-        'n_envs': 4,
+        'max_steps': 500,
+        'n_envs': 16,
         'seed': 42
     },
     
+    # ========== SAC - GPU OPTIMIZED ==========
     {
-        'name': 'ppo_512x2_lr15e4_b1024_env8',
-        'description': 'Largest batch size (1024), 8 parallel envs, fast throughput',
-        'algorithm': 'PPO',
-        'total_timesteps': 2000000,
-        'learning_rate': 1.5e-4,
-        'batch_size': 1024,
+        'name': 'sac_512x2_lr3e4_gpu',
+        'description': 'SAC on GPU, fast learning, good for continuous control',
+        'algorithm': 'SAC',
+        'total_timesteps': 1000000,
+        'learning_rate': 3e-4,
+        'batch_size': 512,
         'n_steps': 2048,
         'net_arch': '512 512',
         'gamma': 0.99,
         'gae_lambda': 0.95,
         'clip_range': 0.2,
-        'ent_coef': 0.005,
+        'ent_coef': 'auto',
         'vf_coef': 0.5,
-        'max_velocity': 0.035,
-        'reward_scale': 0.5,
-        'max_steps': 700,
-        'n_envs': 8,
-        'seed': 789
+        'tau': 0.005,
+        'buffer_size': 200000,
+        'max_velocity': 0.03,
+        'reward_scale': 1.0,
+        'max_steps': 500,
+        'n_envs': 1,
+        'seed': 42
     },
     
     {
-        'name': 'ppo_256x3_lr8e5_step8192_g995',
-        'description': 'Longest horizon planning (8192 steps), highest gamma, deep net',
-        'algorithm': 'PPO',
-        'total_timesteps': 2000000,
-        'learning_rate': 8e-5,
-        'batch_size': 256,
-        'n_steps': 8192,
-        'net_arch': '256 256 256',
-        'gamma': 0.995,
-        'gae_lambda': 0.97,
+        'name': 'sac_512x2_lr1e4_vel02_gpu',
+        'description': 'SAC precision config, slow velocity, GPU optimized',
+        'algorithm': 'SAC',
+        'total_timesteps': 1000000,
+        'learning_rate': 1e-4,
+        'batch_size': 512,
+        'n_steps': 2048,
+        'net_arch': '512 512',
+        'gamma': 0.99,
+        'gae_lambda': 0.95,
         'clip_range': 0.2,
-        'ent_coef': 0.002,
+        'ent_coef': 'auto',
         'vf_coef': 0.5,
-        'max_velocity': 0.03,
-        'reward_scale': 0.8,
-        'max_steps': 1000,
-        'n_envs': 4,
-        'seed': 42
+        'tau': 0.005,
+        'buffer_size': 300000,
+        'max_velocity': 0.02,
+        'reward_scale': 1.0,
+        'max_steps': 500,
+        'n_envs': 1,
+        'seed': 456
+    },
+    
+    {
+        'name': 'sac_256x3_lr2e4_gpu',
+        'description': 'SAC deep network, GPU, good capacity',
+        'algorithm': 'SAC',
+        'total_timesteps': 1000000,
+        'learning_rate': 2e-4,
+        'batch_size': 256,
+        'n_steps': 2048,
+        'net_arch': '256 256 256',
+        'gamma': 0.99,
+        'gae_lambda': 0.95,
+        'clip_range': 0.2,
+        'ent_coef': 'auto',
+        'vf_coef': 0.5,
+        'tau': 0.005,
+        'buffer_size': 200000,
+        'max_velocity': 0.035,
+        'reward_scale': 0.7,
+        'max_steps': 500,
+        'n_envs': 1,
+        'seed': 123
     }
 ]
 
@@ -269,14 +254,14 @@ CONFIGS = [
 def print_configs_summary():
     """Print a summary of all 12 configurations."""
     print("\n" + "="*100)
-    print("12 RL CONFIGURATIONS - TECHNICAL NAMES")
+    print("12 SPEED-OPTIMIZED RL CONFIGURATIONS")
     print("="*100)
     
     categories = [
-        ("CONSERVATIVE (Stable, Safe Learning)", 0, 3),
-        ("MODERATE (Balanced, Recommended)", 3, 6),
-        ("AGGRESSIVE (Fast Learning, Higher Risk)", 6, 9),
-        ("SPECIALIZED (Optimized for Specific Goals)", 9, 12)
+        ("FAST PPO - HIGH PARALLELISM (16-24 envs, CPU)", 0, 4),
+        ("ULTRA-FAST PPO (32 envs, CPU)", 4, 6),
+        ("PRECISION PPO (16 envs, CPU)", 6, 8),
+        ("SAC - GPU OPTIMIZED (1 env, GPU)", 8, 12)
     ]
     
     for cat_name, start, end in categories:
@@ -284,14 +269,27 @@ def print_configs_summary():
         print("-" * 100)
         for i in range(start, end):
             cfg = CONFIGS[i]
-            print(f"{i}. {cfg['name']}")
+            device = "GPU" if cfg['algorithm'] == 'SAC' else "CPU"
+            timesteps = f"{cfg['total_timesteps']/1e6:.1f}M"
+            print(f"{i}. {cfg['name']} [{device}, {timesteps}, {cfg['n_envs']} envs]")
             print(f"   {cfg['description']}")
     
     print("\n" + "="*100)
-    print("QUICK START:")
-    print("  Recommended:  python launch_experiments.py --config 4 --use-gpu")
-    print("  Best 3:       python launch_experiments.py --config 1 4 9 --use-gpu")
-    print("  All 12:       python launch_experiments.py --all --use-gpu")
+    print("SPEED IMPROVEMENTS:")
+    print("  • PPO: 16-32 parallel envs (was 4-8) → 4-8x faster!")
+    print("  • All: 1M timesteps (was 2M) → 2x faster!")
+    print("  • Shorter episodes (300-500 steps) → faster iterations")
+    print("  • SAC uses GPU properly")
+    print("\nESTIMATED TIME PER CONFIG:")
+    print("  • PPO (16 envs): 1-2 hours (was 15+ hours)")
+    print("  • PPO (24 envs): 45-90 min")
+    print("  • PPO (32 envs): 30-60 min")
+    print("  • SAC (GPU): 2-3 hours")
+    print("\nTOTAL FOR ALL 12: 12-20 hours (was 100+ hours)")
+    print("="*100)
+    print("\nQUICK START:")
+    print("  Best 3:  python launch_experiments.py --config 1 7 9")
+    print("  All 12:  python queue_all_configs.py")
     print("="*100 + "\n")
 
 
