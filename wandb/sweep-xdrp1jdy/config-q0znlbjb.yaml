@@ -1,0 +1,36 @@
+wandb_version: 1
+
+algorithm:
+  value: PPO
+batch_size:
+  value: 256
+clip_range:
+  value: 0.29201996950665854
+ent_coef:
+  value: 0.0372451566086618
+gae_lambda:
+  value: 0.9777900669123
+gamma:
+  value: 0.998367915685523
+learning_rate:
+  value: 0.00047718862389470215
+max_steps:
+  value: 700
+max_velocity:
+  value: 0.04361985430338583
+n_envs:
+  value: 2
+n_steps:
+  value: 1024
+net_arch:
+  value: 512 512
+reward_scale:
+  value: 2.263799893222475
+seed:
+  value: 456
+success_threshold:
+  value: 0.005
+total_timesteps:
+  value: 1000000
+vf_coef:
+  value: 0.5306725692720703
