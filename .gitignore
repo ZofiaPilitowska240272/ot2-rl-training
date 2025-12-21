@@ -1,0 +1,8 @@
+﻿__pycache__/
+*.pyc
+*.py[cod]
+.Python
+venv/
+models/
+wandb/
+*.zip
