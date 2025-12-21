@@ -250,32 +250,68 @@ class OT2GymEnv(gym.Env):
     
     def _compute_reward(self, current_pos, target_pos, action, distance, previous_distance):
         """
-        SIMPLIFIED reward function - easy to understand but still effective.
+        IMPROVED reward function with better shaping.
         
-        Components:
-        1. Distance penalty (main signal)
-        2. Progress reward (getting closer)
-        3. Success bonus
+        Key improvements:
+        1. Multi-scale distance rewards (coarse + fine)
+        2. Progress-based rewards
+        3. Stronger precision incentives near target
+        4. Better action penalties
         """
-        # 1. DISTANCE PENALTY (main reward signal)
-        # -100 at 100mm, -50 at 50mm, -5 at 5mm, 0 at 0mm
-        distance_penalty = -distance * 100.0
+        # 1. COARSE DISTANCE REWARD (linear, always active)
+        # Scale: -1000 at 1m, -50 at 0.05m, -5 at 0.005m
+        coarse_reward = -distance * 1000.0
         
-        # 2. PROGRESS REWARD (encourage moving closer)
+        # 2. FINE DISTANCE REWARD (quadratic, emphasizes precision)
+        # Becomes dominant at <10cm
+        fine_reward = -10000.0 * distance**2
+        
+        # 3. PRECISION REWARD (exponential, very strong near target)
+        # Kicks in at <5cm, maximum at target
+        if distance < 0.05:  # Within 5cm
+            precision_reward = 50.0 * np.exp(-100.0 * distance)
+        else:
+            precision_reward = 0.0
+        
+        # 4. PROGRESS REWARD (encourage getting closer)
         if previous_distance is not None:
             progress = previous_distance - distance
-            progress_reward = progress * 100.0  # Big reward for getting closer
+            # Reward for moving closer, penalty for moving away
+            progress_reward = progress * 500.0
         else:
             progress_reward = 0.0
         
-        # 3. SUCCESS BONUS (reached target)
+        # 5. GOAL REWARD (sparse, big bonus for success)
         if distance < self.success_threshold:
-            success_bonus = 100.0
+            goal_reward = 1000.0
+        elif distance < self.success_threshold * 2:  # Close!
+            goal_reward = 500.0
+        elif distance < self.success_threshold * 4:  # Getting there
+            goal_reward = 250.0
         else:
-            success_bonus = 0.0
+            goal_reward = 0.0
         
-        # TOTAL REWARD
-        total_reward = (distance_penalty + progress_reward + success_bonus) * self.reward_scale
+        # 6. ACTION PENALTY (encourage smooth, efficient movements)
+        action_magnitude = np.linalg.norm(action)
+        action_penalty = -0.5 * action_magnitude 
+        
+        # 7. EFFICIENCY BONUS (reward quick success)
+        if distance < self.success_threshold:
+            steps_remaining = self.max_steps - self.current_step
+            efficiency_bonus = steps_remaining * 0.1
+        else:
+            efficiency_bonus = 0.0
+        
+        # COMBINE A REWARDS
+        total_reward = (
+            coarse_reward +
+            fine_reward +
+            precision_reward +
+            progress_reward +
+            goal_reward +
+            action_penalty +
+            efficiency_bonus
+        ) * self.reward_scale
         
         return total_reward
 
@@ -324,7 +360,7 @@ class OT2GymEnv(gym.Env):
                 'reward': 0.0
             })
         
-        # Simplified observation (6D like Aaron's)
+        
         observation = np.concatenate([
             current_pos,
             self.target_position
