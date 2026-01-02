@@ -249,33 +249,28 @@ class OT2GymEnv(gym.Env):
                 self.work_envelope['z_min'] <= z <= self.work_envelope['z_max'])
     
     def _compute_reward(self, current_pos, target_pos, action, distance, previous_distance):
-        """
-        SIMPLIFIED reward function - easy to understand but still effective.
+        """STRONG reward function for <5mm target."""
         
-        Components:
-        1. Distance penalty (main signal)
-        2. Progress reward (getting closer)
-        3. Success bonus
-        """
-        # 1. DISTANCE PENALTY (main reward signal)
-        # -100 at 100mm, -50 at 50mm, -5 at 5mm, 0 at 0mm
-        distance_penalty = -distance * 100.0
+        # 1. Distance penalty
+        distance_penalty = -distance * 200.0  # Strong!
         
-        # 2. PROGRESS REWARD (encourage moving closer)
+        # 2. Progress reward - MUCH STRONGER
         if previous_distance is not None:
             progress = previous_distance - distance
-            progress_reward = progress * 100.0  # Big reward for getting closer
+            progress_reward = progress * 1000.0  # 10x stronger!
         else:
             progress_reward = 0.0
         
-        # 3. SUCCESS BONUS (reached target)
+        # 3. Success bonus
         if distance < self.success_threshold:
-            success_bonus = 100.0
+            success_bonus = 1000.0
+        elif distance < self.success_threshold * 2:
+            success_bonus = 500.0
         else:
             success_bonus = 0.0
         
-        # TOTAL REWARD
-        total_reward = (distance_penalty + progress_reward + success_bonus) * self.reward_scale
+        # Total - no reward_scale multiplication
+        total_reward = distance_penalty + progress_reward + success_bonus
         
         return total_reward
 
