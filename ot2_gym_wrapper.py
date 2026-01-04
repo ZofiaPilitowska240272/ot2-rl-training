@@ -1,15 +1,5 @@
 """
-FIXED Gymnasium Wrapper for OT-2 RL Controller
------------------------------------------------
-This version fixes the reward function for better learning.
-
-Key fixes:
-1. Better reward shaping with multiple distance scales
-2. Improved precision rewards near target
-3. Progress-based rewards
-4. Better action penalties
-
-Author: Zofia Pilitowska (240272)
+ Gymnasium Wrapper for OT-2 RL Controller)
 """
 
 import gymnasium as gym
@@ -21,7 +11,7 @@ from typing import Tuple, Dict, Any, Optional
 
 class OT2GymEnv(gym.Env):
     """
-    FIXED Gymnasium environment for OT-2 pipette positioning control.
+     Gymnasium environment for OT-2 pipette positioning control.
     """
     
     metadata = {"render_modes": ["human", "rgb_array"], "render_fps": 30}
@@ -61,7 +51,7 @@ class OT2GymEnv(gym.Env):
             dtype=np.float32
         )
         
-        # Observation space: [pos(3), target(3)] - simplified like Aaron's
+        
         obs_low = np.array([
             self.work_envelope['x_min'],
             self.work_envelope['y_min'],
@@ -86,7 +76,7 @@ class OT2GymEnv(gym.Env):
             dtype=np.float32
         )
         
-        # Episode tracking (simplified)
+        # Episode tracking 
         self.current_step = 0
         self.previous_distance = None  # For progress rewards
         self.cumulative_reward = 0.0
@@ -319,7 +309,7 @@ class OT2GymEnv(gym.Env):
                 'reward': 0.0
             })
         
-        # Simplified observation (6D like Aaron's)
+        #  observation
         observation = np.concatenate([
             current_pos,
             self.target_position
@@ -361,8 +351,7 @@ class OT2GymEnv(gym.Env):
         self._set_joint_velocities(action)
         
         # Step simulation
-        for _ in range(8):
-            p.stepSimulation()
+        p.stepSimulation()
         
         # Get new state
         current_pos = self._get_pipette_position()
@@ -405,7 +394,7 @@ class OT2GymEnv(gym.Env):
                 'reward': reward
             })
         
-        # Simplified observation (6D like Aaron's)
+        
         observation = np.concatenate([
             current_pos,
             self.target_position
