@@ -177,15 +177,16 @@ class OT2GymEnv(gym.Env):
         """Execute one step."""
         action = np.clip(action, -1.0, 1.0).astype(np.float32)
         
-        # Scale velocity actions (first 3 dimensions)
-        scaled_action = action.copy()
-        scaled_action[:3] = action[:3] * self.max_velocity
+        # Create full action [vx, vy, vz, drop]
+        full_action = [
+            float(action[0]),
+            float(action[1]),
+            float(action[2]),
+            0.0  # No dropping
+        ]
         
-        
-        try:
-            observation = self.sim.run([scaled_action.tolist()])
-        except:
-            observation = self.sim.run(scaled_action.tolist())
+        # Run simulation
+        observation = self.sim.run([full_action])
         
         # Extract robot state
         robot_state = observation.get(self.robot_id, {})
@@ -194,6 +195,7 @@ class OT2GymEnv(gym.Env):
             dtype=np.float32
         )
         
+    
         # Calculate distance to goal
         distance = self._compute_distance(self.pipette_position, self.target_position)
         

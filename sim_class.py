@@ -104,6 +104,34 @@ class Simulation:
     # =========================================================================
     # STATE HELPERS
     # =========================================================================
+    def reset(self, num_agents=None):
+        """Reset robot joints to initial positions."""
+        # Reset all robots to initial joint positions
+        initial_joints = [0.04, 0.065, 0.11]
+        
+        for robotId in self.robotIds:
+            for i in range(3):
+                p.resetJointState(robotId, i, targetValue=initial_joints[i])
+                p.setJointMotorControl2(
+                    robotId, i,
+                    p.VELOCITY_CONTROL,
+                    targetVelocity=0,
+                    force=0
+                )
+            
+            # Update pipette position after reset
+            self.pipette_positions[f'robotId_{robotId}'] = self.get_pipette_position(robotId)
+        
+        # Clear any existing droplets
+        for sphereId in self.sphereIds[:]:
+            try:
+                p.removeBody(sphereId)
+            except:
+                pass
+        self.sphereIds = []
+        self.droplet_positions = {}
+        
+        return self.get_states()
 
     def get_pipette_position(self, robotId):
         base_pos = np.array(p.getBasePositionAndOrientation(robotId)[0], dtype=np.float32)
