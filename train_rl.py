@@ -135,6 +135,13 @@ parser.add_argument("--gamma", type=float, default=0.99)
 parser.add_argument("--max_steps_truncate", type=int, default=300)
 parser.add_argument("--target_threshold", type=float, default=0.005)
 parser.add_argument("--max_velocity", type=float, default=0.03)
+parser.add_argument("--run_name", type=str, default="default_run")
+parser.add_argument("--n_epochs", type=int, default=10)
+parser.add_argument("--gae_lambda", type=float, default=0.95)
+parser.add_argument("--clip_range", type=float, default=0.3)
+parser.add_argument("--ent_coef", type=float, default=0.0)
+parser.add_argument("--vf_coef", type=float, default=0.5)
+
 args = parser.parse_args()
 
 # Execute remotely AFTER capturing arguments
@@ -196,8 +203,9 @@ ot2_callback = OT2Callback(threshold=args.target_threshold, verbose=1)
 model.learn(
     total_timesteps=args.total_timesteps,
     callback=ot2_callback,
-    tb_log_name=f"PPO_{filename}"
+    tb_log_name=f"PPO_{args.run_name}_{filename}"
 )
+
 
 # ============================================================================
 # Save and Upload Model
