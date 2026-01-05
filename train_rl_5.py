@@ -166,7 +166,8 @@ model = PPO(
     gamma=args.gamma,
     gae_lambda=0.95,
     clip_range=0.2,
-    verbose=1
+    verbose=1,
+    tensorboard_log=f"runs/zofia"
 )
 
 # ============================================================================
