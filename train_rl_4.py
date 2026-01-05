@@ -87,4 +87,4 @@ class OT2Callback(BaseCallback):
             
             successful_lengths = [l for l, s in zip(self.episode_lengths, self.episode_successes) if s]
             if successful_lengths:
-                print(f"Successful episodes avg length: {np.mean(successful_lengths):.1f}
+                print(f"Successful episodes avg length: {np.mean(successful_lengths):.1f} steps")
