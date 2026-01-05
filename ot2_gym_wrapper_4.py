@@ -27,12 +27,13 @@ class OT2Env(gym.Env):
         self.prev_position = None
 
     def reset(self, seed=42):
+        self.sim.set_start_position(0.0, 0.0, 0.15)  # ← THIS LINE
         observation = self.sim.reset()
 
         robotId = list(observation.keys())[0]
 
         np.random.seed(seed)
-        self.goal_position = np.random.uniform(low=(X_MIN, Y_MIN, Z_MIN), high=(X_MAX, Y_MAX, Z_MAX))
+        self.goal_position = np.random.uniform(low=(X_MAX, Y_MIN, Z_MIN), high=(X_MAX, Y_MAX, Z_MAX))
 
         pipette_position = self.sim.pipette_positions[robotId]
 
